@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const source = './source-folder';
-const newFolder = './new-folder';
+
+let source = './source-folder';
+let newFolder = './new-folder';
+let pathToReadedFolder;
 
 
 fs.readdir(source, (error, files) => {
@@ -22,20 +24,55 @@ fs.readdir(source, (error, files) => {
 
     const arr = [];
 
-    function isFileCheck (files) {
-      files.forEach((file) => {
-        fs.stat(path.join(__dirname, source, file), (error, stat) => {
-          if (stat.isFile()) {
-            arr.push(stat);
-          } else if (stat.isDirectory){
-          //    code
-          }
+    files.forEach((file) => {
+      source = './source-folder';
+      pathToReadedFolder = path.join(__dirname, source);
+
+      fs.stat(pathToReadedFolder, (error, currentFile) => {
+
+        if (currentFile.isFile()) {
+          pushToArr(currentFile);
+        } else if (currentFile.isDirectory()){
+          source = path.join(source, file);
+          pathToReadedFolder = path.join(__dirname, source);
+          readDir(file, pathToReadedFolder);
+        } else {
+          return;
+        }
+
+      })
+    })
+
+    function pushToArr(file) {
+      arr.push(file);
+    }
+
+    function readDir(file, pathToReadedFolder) {
+      readDirectory(file, pathToReadedFolder)
+    }
+
+    function readDirectory(file, pathToReadedFolder) {
+      console.log(pathToReadedFolder);
+      fs.readdir(pathToReadedFolder, (error, files) => {
+        files.forEach((file) => {
+          console.log('test');
+          fs.stat(path.join(pathToReadedFolder, file), (error, file) => {
+            if (file.isFile()) {
+              pushToArr(file);
+            } else if (file.isDirectory()){
+              readDir(file);
+            } else {
+              return;
+            }
+          })
         })
       })
     }
 
-    isFileCheck(files);
 
+    setTimeout(() => {
+      console.log(arr);
+    }, 10000);
 
 });
 
