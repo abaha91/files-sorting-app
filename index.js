@@ -4,7 +4,17 @@ const path = require('path');
 let source = path.join(__dirname, 'source-folder');
 let newFolder = path.join(__dirname, 'new-folder');
 
-
+const createNewFolder = function(newFolder, source) {
+  !fs.exists(newFolder, () => {
+    fs.mkdir(path.join(newFolder), (error) => {
+      if (error) {
+        console.log('Folder can not be created');
+        return;
+      }
+      readDirectory(source);
+    });
+  })
+};
 
 const readDirectory = function(source) {
 
@@ -23,41 +33,37 @@ const readDirectory = function(source) {
       let firstLetterOfFileName = file[0];
 
       fs.stat(pathToFile, (error, currentFile) => {
-        if (currentFile.isFile() && !fs.existsSync(pathToNewFile)) {
-          if (!fs.exists(path.join(newFolder, firstLetterOfFileName))) {
-            console.log(path.join(newFolder, firstLetterOfFileName));
-            fs.mkdir(path.join(newFolder, firstLetterOfFileName));
-          }
+        if (currentFile.isFile()) {
 
-          fs.link(pathToFile, pathToNewFile, (error) => {
-            if (error) {
-              console.log(error);
-            }
-          })
+          !fs.exists(path.join(newFolder, firstLetterOfFileName), () => {
+            fs.mkdir(path.join(newFolder, firstLetterOfFileName), () => {
+              fs.link(pathToFile, pathToNewFile, (error) => {
+                if (error) {
+                  console.log(error);
+                  return;
+                };
 
+                fs.unlink(pathToFile, () => {
+                  console.log('File ' + file + ' removed');
+                })
+              })
+            });
+          });
         } else if (currentFile.isDirectory()) {
-          readDirectory(pathToFile);
+          if (!files.length) {
+            fs.rmdir(currentFile, () => {
+              console.log('Folder ' + file + ' removed');
+            })
+          } else {
+            readDirectory(pathToFile);
+          }
         }
       })
     });
   });
-
 };
 
-
-const createNewFolder = function(newFolder) {
-  if (!fs.exists(newFolder)) {
-    fs.mkdir(path.join(newFolder), (error) => {
-      if (error) {
-        console.log('Folder can not be created');
-        return;
-      }
-    });
-  }
-};
-
-createNewFolder(newFolder);
-readDirectory(source);
+createNewFolder(newFolder, source);
 
 
 
