@@ -1,78 +1,58 @@
 const fs = require('fs');
 const path = require('path');
 
-let source = './source-folder';
-let newFolder = './new-folder';
-let pathToReadedFolder;
+let source = path.join(__dirname, 'source-folder');
+let newFolder = path.join(__dirname, 'new-folder');
 
 
 fs.readdir(source, (error, files) => {
 
-    if (error) {
-        console.log('Error');
-        return;
-    }
+  if (error) {
+      console.log('Error');
+      return;
+  }
 
-    // if (files) {
-    //   fs.mkdir(path.join(__dirname, 'new-folder'), (error) => {
-    //     if (error) {
-    //       console.log('Folder can not be created');
-    //       return;
-    //     }
-    //   });
-    // }
+  createNewFolder();
 
-    const arr = [];
 
-    files.forEach((file) => {
-      source = './source-folder';
-      pathToReadedFolder = path.join(__dirname, source);
 
-      fs.stat(pathToReadedFolder, (error, currentFile) => {
+  files.forEach((file) => {
 
-        if (currentFile.isFile()) {
-          pushToArr(currentFile);
-        } else if (currentFile.isDirectory()){
-          source = path.join(source, file);
-          pathToReadedFolder = path.join(__dirname, source);
-          readDir(file, pathToReadedFolder);
-        } else {
-          return;
+    let source = path.join(__dirname, 'source-folder');
+    let pathToFile = path.join(source, file);
+    let pathToNewFile = path.join(newFolder, file[0], file);
+    let firstLetterOfFileName = file[0];
+
+    fs.stat(pathToFile, (error, currentFile) => {
+      if (currentFile.isFile() && !fs.existsSync(pathToNewFile)) {
+
+
+        if (!fs.existsSync(path.join(newFolder, firstLetterOfFileName))) {
+          fs.mkdir(path.join(newFolder, firstLetterOfFileName));
         }
 
-      })
-    })
-
-    function pushToArr(file) {
-      arr.push(file);
-    }
-
-    function readDir(file, pathToReadedFolder) {
-      readDirectory(file, pathToReadedFolder)
-    }
-
-    function readDirectory(file, pathToReadedFolder) {
-      console.log(pathToReadedFolder);
-      fs.readdir(pathToReadedFolder, (error, files) => {
-        files.forEach((file) => {
-          console.log('test');
-          fs.stat(path.join(pathToReadedFolder, file), (error, file) => {
-            if (file.isFile()) {
-              pushToArr(file);
-            } else if (file.isDirectory()){
-              readDir(file);
-            } else {
-              return;
-            }
-          })
+        fs.link(pathToFile, pathToNewFile, (error) => {
+          if (error) {
+            console.log(error);
+          }
         })
-      })
+      } else if (currentFile.isDirectory()) {
+        source = path.join(source, file);
+        // readDir()
+      }
+    })
+  });
+
+  function createNewFolder() {
+    if (files && !fs.existsSync(newFolder)) {
+      fs.mkdir(path.join(__dirname, 'new-folder'), (error) => {
+        if (error) {
+          console.log('Folder can not be created');
+          return;
+        }
+      });
     }
-
-
-    setTimeout(() => {
-      console.log(arr);
-    }, 10000);
+  }
 
 });
 
