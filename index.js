@@ -1,69 +1,66 @@
-const fs = require('fs');
-const path = require('path');
+const sortingApp = function() {
+  const fs = require('fs');
+  const path = require('path');
 
-let source = path.join(__dirname, 'source-folder');
-let newFolder = path.join(__dirname, 'new-folder');
+  let source = path.join(__dirname, 'source-folder');
+  let newFolder = path.join(__dirname, 'new-folder');
 
-const createNewFolder = function(newFolder, source) {
-  !fs.exists(newFolder, () => {
-    fs.mkdir(path.join(newFolder), (error) => {
+  const createNewFolder = function(newFolder, source) {
+    !fs.exists(newFolder, () => {
+      fs.mkdir(path.join(newFolder), (error) => {
+        if (error) {
+          console.log('Folder can not be created');
+          return;
+        }
+        readDirectory(source);
+      });
+      console.log('Files successfully sorted');
+    })
+  };
+
+  const readDirectory = function(source) {
+
+    fs.readdir(source, (error, files) => {
+
       if (error) {
-        console.log('Folder can not be created');
-        return;
-      }
-      readDirectory(source);
-    });
-  })
-};
-
-const readDirectory = function(source) {
-
-  fs.readdir(source, (error, files) => {
-
-    if (error) {
         console.log('Error');
         return;
-    }
+      }
 
-    files.forEach((file) => {
+      files.forEach((file) => {
 
-      let localSource = path.join(source);
-      let pathToFile = path.join(localSource, file);
-      let pathToNewFile = path.join(newFolder, file[0], file);
-      let firstLetterOfFileName = file[0];
+        let localSource = path.join(source);
+        let pathToFile = path.join(localSource, file);
+        let pathToNewFile = path.join(newFolder, file[0], file);
+        let firstLetterOfFileName = file[0];
 
-      fs.stat(pathToFile, (error, currentFile) => {
-        if (currentFile.isFile()) {
+        fs.stat(pathToFile, (error, currentFile) => {
+          if (currentFile.isFile()) {
 
-          !fs.exists(path.join(newFolder, firstLetterOfFileName), () => {
-            fs.mkdir(path.join(newFolder, firstLetterOfFileName), () => {
-              fs.link(pathToFile, pathToNewFile, (error) => {
-                if (error) {
-                  console.log(error);
-                  return;
-                };
-
-                fs.unlink(pathToFile, () => {
-                  console.log('File ' + file + ' removed');
+            !fs.exists(path.join(newFolder, firstLetterOfFileName), () => {
+              fs.mkdir(path.join(newFolder, firstLetterOfFileName), () => {
+                fs.link(pathToFile, pathToNewFile, (error) => {
+                  if (error) {
+                    console.log(error);
+                    return;
+                  };
                 })
-              })
+              });
             });
-          });
-        } else if (currentFile.isDirectory()) {
-          if (!files.length) {
-            fs.rmdir(currentFile, () => {
-              console.log('Folder ' + file + ' removed');
-            })
-          } else {
+          } else if (currentFile.isDirectory()) {
             readDirectory(pathToFile);
           }
-        }
-      })
+        })
+      });
     });
-  });
-};
+  };
 
-createNewFolder(newFolder, source);
+  createNewFolder(newFolder, source);
+}
+
+module.exports = sortingApp;
+
+
 
 
 
