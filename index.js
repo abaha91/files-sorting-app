@@ -31,13 +31,19 @@ const sortingApp = function() {
         const fileStat = fs.statSync(pathToFile);
 
         if(fileStat.isFile()) {
-          const isFileExist = fs.existsSync(path.join(newFolder, firstLetterOfFileName));
 
-          if (!isFileExist) {
+          const isDirectoryExist = fs.existsSync(path.join(newFolder, firstLetterOfFileName));
+          if (!isDirectoryExist) {
             fs.mkdirSync(path.join(newFolder, firstLetterOfFileName));
+          }
+
+          const isFileExist = fs.existsSync(path.join(pathToNewFile));
+          if (!isFileExist) {
             fs.linkSync(pathToFile, pathToNewFile);
           }
-        } else if (fileStat.isFile()) {
+
+
+        } else if (fileStat.isDirectory()) {
           readDirectory(pathToFile);
         }
       });
