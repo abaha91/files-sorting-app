@@ -5,23 +5,22 @@ const sortingApp = function() {
   let source = path.join(__dirname, 'source-folder');
   let newFolder = path.join(__dirname, 'new-folder');
 
-  const createNewFolder = function(newFolder, source) {
-    const isDirectoryExist = fs.existsSync(newFolder);
+  const createNewFolder = async function(newFolder) {
+    const isDirectoryExist = await fs.existsSync(newFolder);
 
     if (!isDirectoryExist) {
-      fs.mkdirSync(path.join(newFolder));
+      await fs.mkdirSync(path.join(newFolder));
     }
 
-    readDirectory(source);
     console.log('Files successfully sorted');
 
   };
 
-  const readDirectory = function(source) {
+  const readDirectory = async function(source) {
 
     const sourceDirectory = fs.readdirSync(source);
 
-      sourceDirectory.forEach((file) => {
+       sourceDirectory.forEach( (file) => {
 
         let localSource = path.join(source);
         let pathToFile = path.join(localSource, file);
@@ -49,7 +48,8 @@ const sortingApp = function() {
       });
   };
 
-  createNewFolder(newFolder, source);
+  createNewFolder(newFolder)
+    .then(() => readDirectory(source));
 }
 
 module.exports = sortingApp;
