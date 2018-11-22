@@ -1,0 +1,23 @@
+{
+  "name": "files-sorting-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "yargs": "^12.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abaha91/files-sorting-app.git"
+  },
+  "author": "Gennadiy Abashkin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abaha91/files-sorting-app/issues"
+  },
+  "homepage": "https://github.com/abaha91/files-sorting-app#readme"
+}
